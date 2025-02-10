@@ -117,12 +117,23 @@ const ParamEditor = ({ model, params }: Props) => {
   );
 };
 
-const DEFAULT_PARAMS: Param[] = [
+const DEFAULT_PARAMS = [
   { id: 1, name: 'Параметр 1', type: 'string' },
   { id: 2, name: 'Параметр 2', type: 'string' },
   // РАСШИРЕНИЕ: добавляем параметр с типом число
   // { id: 3, name: 'Параметр 3', type: 'number' },
-];
+] as const satisfies Param[];
+
+type DefaultParamsTuple = typeof DEFAULT_PARAMS;
+
+type DefaultParamValues<T extends DefaultParamsTuple = DefaultParamsTuple> = {
+  [K in keyof T]: T[K] extends { id: infer ID, type: infer TN }
+    ? {
+      paramId: ID,
+      value: Extract<ParamType, { type: TN }>['value']
+    }
+    : T[K];
+};
 
 const DEFAULT_MODEL: Model = {
   paramValues: [
@@ -130,7 +141,7 @@ const DEFAULT_MODEL: Model = {
     { paramId: 2, value: '2-2' },
     //  РАСШИРЕНИЕ: Добавляем значение для параметра с типом число
     // { paramId: 3, value: 0 },
-  ],
+  ] satisfies DefaultParamValues,
 };
 
 export function App() {
